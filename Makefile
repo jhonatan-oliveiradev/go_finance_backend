@@ -10,4 +10,4 @@ migrationUp:
 migrationDrop:
 	migrate -path db/migration -database "postgresql://postgres:postgres@localhost:5432/go_finance?sslmode=disable" -verbose drop
 
-.PHONY: createDb postgres migrationUp
+.PHONY: createDb postgres migrationUp migrationDrop

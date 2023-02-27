@@ -1,0 +1,87 @@
+-- name: CreateAccount :one
+INSERT INTO ACCOUNTS (
+  USER_ID,
+  CATEGORY_ID,
+  TITLE,
+  TYPE,
+  DESCRIPTION,
+  VALUE,
+  DATE
+) VALUES (
+  $1,
+  $2,
+  $3,
+  $4,
+  $5,
+  $6,
+  $7
+) RETURNING *;
+
+-- name: GetAccount :one
+SELECT
+  *
+FROM
+  ACCOUNTS
+WHERE
+  ID = $1 LIMIT 1;
+
+-- name: GetAccounts :many
+SELECT
+  A.ID,
+  A.USER_ID,
+  A.TITLE,
+  A.TYPE,
+  A.DESCRIPTION,
+  A.VALUE,
+  A.DATE,
+  A.CREATED_AT,
+  C.TITLE AS CATEGORY_TITLE
+FROM
+  ACCOUNTS A
+  LEFT JOIN CATEGORIES C
+  ON C.ID = A.CATEGORY_ID
+WHERE
+  A.USER_ID = @USER_ID
+  AND A.TYPE = @TYPE
+  AND LOWER(A.TITLE) LIKE CONCAT('%',
+  LOWER(@TITLE::TEXT),
+  '%')
+  AND LOWER(A.DESCRIPTION) LIKE CONCAT('%',
+  LOWER(@DESCRIPTION::TEXT),
+  '%')
+  AND A.CATEGORY_ID = COALESCE(SQLC.NARG('category_id'),
+  A.CATEGORY_ID)
+  AND A.DATE = COALESCE(SQLC.NARG('date'),
+  A.DATE);
+
+-- name: GetAccountsReports :one
+SELECT
+  SUM(VALUE) AS SUM_VALUE
+FROM
+  ACCOUNTS
+WHERE
+  USER_ID = $1
+  AND TYPE = $2;
+
+-- name: GetAccountsGraph :one
+SELECT
+  COUNT(*)
+FROM
+  ACCOUNTS
+WHERE
+  USER_ID = $1
+  AND TYPE = $2;
+
+-- name: UpdateAccount :one
+UPDATE ACCOUNTS
+SET
+  TITLE = $2,
+  DESCRIPTION = $3,
+  VALUE = $4
+WHERE
+  ID = $1 RETURNING *;
+
+-- name: DeleteAccount :exec
+DELETE FROM ACCOUNTS
+WHERE
+  ID = $1;
