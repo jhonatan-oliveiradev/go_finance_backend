@@ -8,4 +8,12 @@ type Store interface {
 
 type SQLStore struct {
 	db *sql.DB
+	*Queries
+}
+
+func NewStore(db *sql.DB) Store {
+	return &SQLStore{
+		db:      db,
+		Queries: New(db),
+	}
 }
