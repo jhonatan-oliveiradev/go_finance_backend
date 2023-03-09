@@ -63,7 +63,7 @@ func (server *Server) getUser(ctx *gin.Context) {
 }
 
 type getUserByIdRequest struct {
-	Id int32 `uri:"id" binding:"required"`
+	ID int32 `uri:"id" binding:"required"`
 }
 
 func (server *Server) getUserById(ctx *gin.Context) {
@@ -71,16 +71,15 @@ func (server *Server) getUserById(ctx *gin.Context) {
 	err := ctx.ShouldBindUri(&req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
 	}
 
-	user, err := server.store.GetUserById(ctx, req.Id)
+	user, err := server.store.GetUserById(ctx, req.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
-		} else {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
 		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
