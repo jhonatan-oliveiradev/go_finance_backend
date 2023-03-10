@@ -85,9 +85,8 @@ func (server *Server) deleteCategory(ctx *gin.Context) {
 
 type updateCategoryRequest struct {
 	ID          int32  `json:"id" binding:"required"`
-	Title       string `json:"title" binding:"required"`
-	Type        string `json:"type" binding:"required"`
-	Description string `json:"description" binding:"required"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }
 
 func (server *Server) updateCategory(ctx *gin.Context) {
@@ -99,6 +98,7 @@ func (server *Server) updateCategory(ctx *gin.Context) {
 	}
 
 	arg := db.UpdateCategoriesParams{
+		ID:          req.ID,
 		Title:       req.Title,
 		Description: req.Description,
 	}
