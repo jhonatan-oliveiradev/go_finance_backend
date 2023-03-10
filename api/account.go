@@ -38,12 +38,12 @@ func (server *Server) createAccount(ctx *gin.Context) {
 		Date:        req.Date,
 	}
 
-	user, err := server.store.CreateAccount(ctx, arg)
+	account, err := server.store.CreateAccount(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 	}
 
-	ctx.JSON(http.StatusOK, user)
+	ctx.JSON(http.StatusOK, account)
 }
 
 type getAccountRequest struct {
@@ -57,7 +57,7 @@ func (server *Server) getAccount(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 	}
 
-	user, err := server.store.GetAccount(ctx, req.ID)
+	account, err := server.store.GetAccount(ctx, req.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -67,7 +67,59 @@ func (server *Server) getAccount(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, user)
+	ctx.JSON(http.StatusOK, account)
+}
+
+type getAccountGraphRequest struct {
+	UserID int32  `uri:"user_id" binding:"required"`
+	Type   string `uri:"type" binding:"required"`
+}
+
+func (server *Server) getAccountGraph(ctx *gin.Context) {
+	var req getAccountGraphRequest
+	err := ctx.ShouldBindUri(&req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+	}
+
+	arg := db.GetAccountsGraphParams{
+		UserID: req.UserID,
+		Type:   req.Type,
+	}
+
+	countGraph, err := server.store.GetAccountsGraph(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, countGraph)
+}
+
+type getAccountReportsRequest struct {
+	UserID int32  `uri:"user_id" binding:"required"`
+	Type   string `uri:"type" binding:"required"`
+}
+
+func (server *Server) getAccountReports(ctx *gin.Context) {
+	var req getAccountReportsRequest
+	err := ctx.ShouldBindUri(&req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+	}
+
+	arg := db.GetAccountsReportsParams{
+		UserID: req.UserID,
+		Type:   req.Type,
+	}
+
+	sumReports, err := server.store.GetAccountsReports(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, sumReports)
 }
 
 type deleteAccountRequest struct {
@@ -112,43 +164,49 @@ func (server *Server) updateAccount(ctx *gin.Context) {
 		Value:       req.Value,
 	}
 
-	user, err := server.store.UpdateAccount(ctx, arg)
+	account, err := server.store.UpdateAccount(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 	}
 
-	ctx.JSON(http.StatusOK, user)
+	ctx.JSON(http.StatusOK, account)
 }
 
-// type getAccountsRequest struct {
-// 	UserID      int32     `json:"user_id" binding:"required"`
-// 	Type        string    `json:"type" binding:"required"`
-// 	CategoryID  int32     `json:"category_id"`
-// 	Title       string    `json:"title"`
-// 	Description string    `json:"description"`
-// 	Date        time.Time `json:"date"`
-// }
+type getAccountsRequest struct {
+	UserID      int32     `json:"user_id" binding:"required"`
+	Type        string    `json:"type" binding:"required"`
+	CategoryID  int32     `json:"category_id"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Date        time.Time `json:"date"`
+}
 
-// func (server *Server) getAccounts(ctx *gin.Context) {
-// 	var req getAccountsRequest
-// 	err := ctx.ShouldBindJSON(&req)
-// 	if err != nil {
-// 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-// 	}
+func (server *Server) getAccounts(ctx *gin.Context) {
+	var req getAccountsRequest
+	err := ctx.ShouldBindJSON(&req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+	}
 
-// 	arg := db.GetAccountsParams{
-// 		UserID:      req.UserID,
-// 		Title:       req.Title,
-// 		CategoryID:  req.CategoryID,
-// 		Type:        req.Type,
-// 		Description: req.Description,
-// 		Date:        req.Date,
-// 	}
+	arg := db.GetAccountsParams{
+		UserID: req.UserID,
+		Type:   req.Type,
+		CategoryID: sql.NullInt32{
+			Int32: req.CategoryID,
+			Valid: req.CategoryID > 0,
+		},
+		Title:       req.Title,
+		Description: req.Description,
+		Date: sql.NullTime{
+			Time:  req.Date,
+			Valid: !req.Date.IsZero(),
+		},
+	}
 
-// 	user, err := server.store.GetAccounts(ctx, arg)
-// 	if err != nil {
-// 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-// 	}
+	account, err := server.store.GetAccounts(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+	}
 
-// 	ctx.JSON(http.StatusOK, user)
-// }
+	ctx.JSON(http.StatusOK, account)
+}
