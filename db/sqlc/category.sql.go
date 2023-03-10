@@ -169,3 +169,147 @@ func (q *Queries) UpdateCategories(ctx context.Context, arg UpdateCategoriesPara
 	)
 	return i, err
 }
+
+const getCategoriesByUserIdAndType = `-- name: getCategoriesByUserIdAndType :many
+SELECT
+  id, user_id, title, type, description, created_at
+FROM
+  CATEGORIES
+WHERE
+  USER_ID = $1
+  AND TYPE = $2
+`
+
+type getCategoriesByUserIdAndTypeParams struct {
+	UserID int32  `json:"user_id"`
+	Type   string `json:"type"`
+}
+
+func (q *Queries) getCategoriesByUserIdAndType(ctx context.Context, arg getCategoriesByUserIdAndTypeParams) ([]Category, error) {
+	rows, err := q.db.QueryContext(ctx, getCategoriesByUserIdAndType, arg.UserID, arg.Type)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Category{}
+	for rows.Next() {
+		var i Category
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Title,
+			&i.Type,
+			&i.Description,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCategoriesByUserIdAndTypeAndDescription = `-- name: getCategoriesByUserIdAndTypeAndDescription :many
+
+SELECT
+  id, user_id, title, type, description, created_at
+FROM
+  CATEGORIES
+WHERE
+  USER_ID = $1
+  AND TYPE = $2
+  AND LOWER(DESCRIPTION) LIKE CONCAT('%',
+  LOWER($3::TEXT),
+  '%')
+`
+
+type getCategoriesByUserIdAndTypeAndDescriptionParams struct {
+	UserID      int32  `json:"user_id"`
+	Type        string `json:"type"`
+	Description string `json:"description"`
+}
+
+func (q *Queries) getCategoriesByUserIdAndTypeAndDescription(ctx context.Context, arg getCategoriesByUserIdAndTypeAndDescriptionParams) ([]Category, error) {
+	rows, err := q.db.QueryContext(ctx, getCategoriesByUserIdAndTypeAndDescription, arg.UserID, arg.Type, arg.Description)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Category{}
+	for rows.Next() {
+		var i Category
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Title,
+			&i.Type,
+			&i.Description,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCategoriesByUserIdAndTypeAndTitle = `-- name: getCategoriesByUserIdAndTypeAndTitle :many
+SELECT
+  id, user_id, title, type, description, created_at
+FROM
+  CATEGORIES
+WHERE
+  USER_ID = $1
+  AND TYPE = $2
+  AND LOWER(TITLE) LIKE CONCAT('%',
+  LOWER($3::TEXT),
+  '%')
+`
+
+type getCategoriesByUserIdAndTypeAndTitleParams struct {
+	UserID int32  `json:"user_id"`
+	Type   string `json:"type"`
+	Title  string `json:"title"`
+}
+
+func (q *Queries) getCategoriesByUserIdAndTypeAndTitle(ctx context.Context, arg getCategoriesByUserIdAndTypeAndTitleParams) ([]Category, error) {
+	rows, err := q.db.QueryContext(ctx, getCategoriesByUserIdAndTypeAndTitle, arg.UserID, arg.Type, arg.Title)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Category{}
+	for rows.Next() {
+		var i Category
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Title,
+			&i.Type,
+			&i.Description,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

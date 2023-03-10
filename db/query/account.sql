@@ -54,6 +54,161 @@ WHERE
   AND A.DATE = COALESCE(SQLC.NARG('date'),
   A.DATE);
 
+-- name: GetAccountsByUserIdAndType :many
+SELECT
+  A.ID,
+  A.USER_ID,
+  A.TITLE,
+  A.TYPE,
+  A.DESCRIPTION,
+  A.VALUE,
+  A.DATE,
+  A.CREATED_AT,
+  C.TITLE AS CATEGORY_TITLE
+FROM
+  ACCOUNTS   A
+  LEFT JOIN CATEGORIES C
+  ON C.ID = A.CATEGORY_ID
+WHERE
+  A.USER_ID = $1
+  AND A.TYPE = $2;
+
+-- name: GetAccountsByUserIdAndTypeAndCategoryId :many
+SELECT
+  A.ID,
+  A.USER_ID,
+  A.TITLE,
+  A.TYPE,
+  A.DESCRIPTION,
+  A.VALUE,
+  A.DATE,
+  A.CREATED_AT,
+  C.TITLE AS CATEGORY_TITLE
+FROM
+  ACCOUNTS   A
+  LEFT JOIN CATEGORIES C
+  ON C.ID = A.CATEGORY_ID
+WHERE
+  A.USER_ID = $1
+  AND A.TYPE = $2
+  AND A.CATEGORY_ID = $3;
+
+-- name: GetAccountsByUserIdAndTypeAndCategoryIdAndTitle :many
+SELECT
+  A.ID,
+  A.USER_ID,
+  A.TITLE,
+  A.TYPE,
+  A.DESCRIPTION,
+  A.VALUE,
+  A.DATE,
+  A.CREATED_AT,
+  C.TITLE AS CATEGORY_TITLE
+FROM
+  ACCOUNTS A
+  LEFT JOIN CATEGORIES C
+  ON C.ID = A.CATEGORY_ID
+WHERE
+  A.USER_ID = $1
+  AND A.TYPE = $2
+  AND A.CATEGORY_ID = $3
+  AND LOWER(A.TITLE) LIKE CONCAT('%',
+  LOWER($4::TEXT),
+  '%');
+
+-- name: GetAccountsByUserIdAndTypeAndAndCategoryIdAndTitleAndDescription :many
+SELECT
+  A.ID,
+  A.USER_ID,
+  A.TITLE,
+  A.TYPE,
+  A.DESCRIPTION,
+  A.VALUE,
+  A.DATE,
+  A.CREATED_AT,
+  C.TITLE AS CATEGORY_TITLE
+FROM
+  ACCOUNTS A
+  LEFT JOIN CATEGORIES C
+  ON C.ID = A.CATEGORY_ID
+WHERE
+  A.USER_ID = $1
+  AND A.TYPE = $2
+  AND A.CATEGORY_ID = $3
+  AND LOWER(A.TITLE) LIKE CONCAT('%',
+  LOWER($4::TEXT),
+  '%')
+  AND LOWER(A.DESCRIPTION) LIKE CONCAT('%',
+  LOWER($5::TEXT),
+  '%');
+
+-- name: GetAccountsByUserIdAndTypeAndTitle :many
+SELECT
+  A.ID,
+  A.USER_ID,
+  A.TITLE,
+  A.TYPE,
+  A.DESCRIPTION,
+  A.VALUE,
+  A.DATE,
+  A.CREATED_AT,
+  C.TITLE AS CATEGORY_TITLE
+FROM
+  ACCOUNTS A
+  LEFT JOIN CATEGORIES C
+  ON C.ID = A.CATEGORY_ID
+WHERE
+  A.USER_ID = $1
+  AND A.TYPE = $2
+  AND LOWER(A.TITLE) LIKE CONCAT('%',
+  LOWER($2::TEXT),
+  '%');
+
+-- name: GetAccountsByUserIdAndTypeAndDescription :many
+SELECT
+  A.ID,
+  A.USER_ID,
+  A.TITLE,
+  A.TYPE,
+  A.DESCRIPTION,
+  A.VALUE,
+  A.DATE,
+  A.CREATED_AT,
+  C.TITLE AS CATEGORY_TITLE
+FROM
+  ACCOUNTS A
+  LEFT JOIN CATEGORIES C
+  ON C.ID = A.CATEGORY_ID
+WHERE
+  A.USER_ID = $1
+  AND A.TYPE = $2
+  AND LOWER(A.DESCRIPTION) LIKE CONCAT('%',
+  LOWER($3::TEXT),
+  '%');
+
+-- name: GetAccountsByUserIdAndTypeAndTitleAndDate :many
+SELECT
+  A.ID,
+  A.USER_ID,
+  A.TITLE,
+  A.TYPE,
+  A.DESCRIPTION,
+  A.VALUE,
+  A.DATE,
+  A.CREATED_AT,
+  C.TITLE AS CATEGORY_TITLE
+FROM
+  ACCOUNTS A
+  LEFT JOIN CATEGORIES C
+  ON C.ID = A.CATEGORY_ID
+WHERE
+  A.USER_ID = $1
+  AND A.TYPE = $2
+  AND LOWER(A.TITLE) LIKE CONCAT('%',
+  LOWER($3::TEXT),
+  '%')
+  AND A.DATE = $4;
+
 -- name: GetAccountsReports :one
 SELECT
   SUM(VALUE) AS SUM_VALUE
@@ -85,3 +240,5 @@ WHERE
 DELETE FROM ACCOUNTS
 WHERE
   ID = $1;
+
+-- docker run --rm -v "C:\Users\peves\Documents\go_finance:/src" -w /src kjconroy/sqlc generate
