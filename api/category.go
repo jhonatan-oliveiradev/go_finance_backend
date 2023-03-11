@@ -17,8 +17,8 @@ type createCategoryRequest struct {
 }
 
 func (server *Server) createCategory(ctx *gin.Context) {
-	errOnValiteToken := util.GetTokenInHeaderAndVerify(ctx)
-	if errOnValiteToken != nil {
+	errOnValidateToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValidateToken != nil {
 		return
 	}
 	var req createCategoryRequest
@@ -47,8 +47,8 @@ type getCategoryRequest struct {
 }
 
 func (server *Server) getCategory(ctx *gin.Context) {
-	errOnValiteToken := util.GetTokenInHeaderAndVerify(ctx)
-	if errOnValiteToken != nil {
+	errOnValidateToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValidateToken != nil {
 		return
 	}
 	var req getCategoryRequest
@@ -75,8 +75,8 @@ type deleteCategoryRequest struct {
 }
 
 func (server *Server) deleteCategory(ctx *gin.Context) {
-	errOnValiteToken := util.GetTokenInHeaderAndVerify(ctx)
-	if errOnValiteToken != nil {
+	errOnValidateToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValidateToken != nil {
 		return
 	}
 	var req deleteCategoryRequest
@@ -101,8 +101,8 @@ type updateCategoryRequest struct {
 }
 
 func (server *Server) updateCategory(ctx *gin.Context) {
-	errOnValiteToken := util.GetTokenInHeaderAndVerify(ctx)
-	if errOnValiteToken != nil {
+	errOnValidateToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValidateToken != nil {
 		return
 	}
 	var req updateCategoryRequest
@@ -133,8 +133,8 @@ type getCategoriesRequest struct {
 }
 
 func (server *Server) getCategories(ctx *gin.Context) {
-	errOnValiteToken := util.GetTokenInHeaderAndVerify(ctx)
-	if errOnValiteToken != nil {
+	errOnValidateToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValidateToken != nil {
 		return
 	}
 	var req getCategoriesRequest
