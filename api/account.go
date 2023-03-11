@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	db "github.com/jhonatan-oliveiradev/go_finance_backend/db/sqlc"
-	// "github.com/jhonatan-oliveiradev/go_finance_backend/util"
+	"github.com/jhonatan-oliveiradev/go_finance_backend/util"
 )
 
 type createAccountRequest struct {
@@ -21,11 +21,14 @@ type createAccountRequest struct {
 }
 
 func (server *Server) createAccount(ctx *gin.Context) {
+	errOnValidateToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValidateToken != nil {
+		return
+	}
 	var req createAccountRequest
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
 	}
 
 	var categoryId = req.CategoryID
@@ -35,11 +38,11 @@ func (server *Server) createAccount(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, errorResponse(err))
 	}
-	categoryTypeIsDifferentOfAccountType := category.Type != accountType
-	if categoryTypeIsDifferentOfAccountType {
-		ctx.JSON(http.StatusBadRequest, "Account type must be the same as Category type!")
-	} else {
 
+	var categoryTypeIsDifferentOfAccountType = category.Type != accountType
+	if categoryTypeIsDifferentOfAccountType {
+		ctx.JSON(http.StatusBadRequest, "Account type is different of Category type")
+	} else {
 		arg := db.CreateAccountParams{
 			UserID:      req.UserID,
 			CategoryID:  categoryId,
@@ -64,6 +67,10 @@ type getAccountRequest struct {
 }
 
 func (server *Server) getAccount(ctx *gin.Context) {
+	errOnValidateToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValidateToken != nil {
+		return
+	}
 	var req getAccountRequest
 	err := ctx.ShouldBindUri(&req)
 	if err != nil {
@@ -89,6 +96,10 @@ type getAccountGraphRequest struct {
 }
 
 func (server *Server) getAccountGraph(ctx *gin.Context) {
+	errOnValidateToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValidateToken != nil {
+		return
+	}
 	var req getAccountGraphRequest
 	err := ctx.ShouldBindUri(&req)
 	if err != nil {
@@ -115,6 +126,10 @@ type getAccountReportsRequest struct {
 }
 
 func (server *Server) getAccountReports(ctx *gin.Context) {
+	errOnValidateToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValidateToken != nil {
+		return
+	}
 	var req getAccountReportsRequest
 	err := ctx.ShouldBindUri(&req)
 	if err != nil {
@@ -140,6 +155,10 @@ type deleteAccountRequest struct {
 }
 
 func (server *Server) deleteAccount(ctx *gin.Context) {
+	errOnValidateToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValidateToken != nil {
+		return
+	}
 	var req deleteAccountRequest
 	err := ctx.ShouldBindUri(&req)
 	if err != nil {
@@ -163,11 +182,14 @@ type updateAccountRequest struct {
 }
 
 func (server *Server) updateAccount(ctx *gin.Context) {
+	errOnValidateToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValidateToken != nil {
+		return
+	}
 	var req updateAccountRequest
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
 	}
 
 	arg := db.UpdateAccountParams{
@@ -195,10 +217,15 @@ type getAccountsRequest struct {
 }
 
 func (server *Server) getAccounts(ctx *gin.Context) {
+	errOnValidateToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValidateToken != nil {
+		return
+	}
 	var req getAccountsRequest
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
 	}
 
 	arg := db.GetAccountsParams{
@@ -216,10 +243,11 @@ func (server *Server) getAccounts(ctx *gin.Context) {
 		},
 	}
 
-	account, err := server.store.GetAccounts(ctx, arg)
+	accounts, err := server.store.GetAccounts(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
 	}
 
-	ctx.JSON(http.StatusOK, account)
+	ctx.JSON(http.StatusOK, accounts)
 }

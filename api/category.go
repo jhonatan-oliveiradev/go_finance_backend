@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	db "github.com/jhonatan-oliveiradev/go_finance_backend/db/sqlc"
-	// "github.com/jhonatan-oliveiradev/go_finance_backend/util"
+	"github.com/jhonatan-oliveiradev/go_finance_backend/util"
 )
 
 type createCategoryRequest struct {
@@ -17,11 +17,14 @@ type createCategoryRequest struct {
 }
 
 func (server *Server) createCategory(ctx *gin.Context) {
+	errOnValiteToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValiteToken != nil {
+		return
+	}
 	var req createCategoryRequest
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
 	}
 
 	arg := db.CreateCategoryParams{
@@ -31,12 +34,12 @@ func (server *Server) createCategory(ctx *gin.Context) {
 		Description: req.Description,
 	}
 
-	user, err := server.store.CreateCategory(ctx, arg)
+	category, err := server.store.CreateCategory(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 	}
 
-	ctx.JSON(http.StatusOK, user)
+	ctx.JSON(http.StatusOK, category)
 }
 
 type getCategoryRequest struct {
@@ -44,6 +47,10 @@ type getCategoryRequest struct {
 }
 
 func (server *Server) getCategory(ctx *gin.Context) {
+	errOnValiteToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValiteToken != nil {
+		return
+	}
 	var req getCategoryRequest
 	err := ctx.ShouldBindUri(&req)
 	if err != nil {
@@ -68,6 +75,10 @@ type deleteCategoryRequest struct {
 }
 
 func (server *Server) deleteCategory(ctx *gin.Context) {
+	errOnValiteToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValiteToken != nil {
+		return
+	}
 	var req deleteCategoryRequest
 	err := ctx.ShouldBindUri(&req)
 	if err != nil {
@@ -90,15 +101,18 @@ type updateCategoryRequest struct {
 }
 
 func (server *Server) updateCategory(ctx *gin.Context) {
+	errOnValiteToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValiteToken != nil {
+		return
+	}
 	var req updateCategoryRequest
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
 	}
 
 	arg := db.UpdateCategoriesParams{
-
+		ID:          req.ID,
 		Title:       req.Title,
 		Description: req.Description,
 	}
@@ -119,6 +133,10 @@ type getCategoriesRequest struct {
 }
 
 func (server *Server) getCategories(ctx *gin.Context) {
+	errOnValiteToken := util.GetTokenInHeaderAndVerify(ctx)
+	if errOnValiteToken != nil {
+		return
+	}
 	var req getCategoriesRequest
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
@@ -128,15 +146,15 @@ func (server *Server) getCategories(ctx *gin.Context) {
 
 	arg := db.GetCategoriesParams{
 		UserID:      req.UserID,
-		Title:       req.Title,
 		Type:        req.Type,
+		Title:       req.Title,
 		Description: req.Description,
 	}
 
-	category, err := server.store.GetCategories(ctx, arg)
+	categories, err := server.store.GetCategories(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 	}
 
-	ctx.JSON(http.StatusOK, category)
+	ctx.JSON(http.StatusOK, categories)
 }
