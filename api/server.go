@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	db "github.com/jhonatan-oliveiradev/go_finance_backend/db/sqlc"
+	cors "github.com/rs/cors/wrapper/gin"
 )
 
 type Server struct {
@@ -13,6 +14,7 @@ type Server struct {
 func NewServer(store *db.SQLStore) *Server {
 	server := &Server{store: store}
 	router := gin.Default()
+	router.Use(cors.Default())
 
 	// User
 	router.POST("/user", server.createUser)
