@@ -43,9 +43,9 @@ func GetTokenInHeaderAndVerify(ctx *gin.Context) error {
 	authorizationHeaderKey := ctx.GetHeader("authorization")
 	fields := strings.Fields(authorizationHeaderKey)
 	tokenToValidate := fields[1]
-	errOnValiteToken := ValidateToken(ctx, tokenToValidate)
-	if errOnValiteToken != nil {
-		return errOnValiteToken
+	errOnValidateToken := ValidateToken(ctx, tokenToValidate)
+	if errOnValidateToken != nil {
+		return errOnValidateToken
 	}
 	return nil
 }

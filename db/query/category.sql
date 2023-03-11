@@ -1,4 +1,3 @@
--- name: CreateCategory :one
 INSERT INTO CATEGORIES (
   USER_ID,
   TITLE,
@@ -30,40 +29,6 @@ WHERE
   AND LOWER(TITLE) LIKE CONCAT('%',
   LOWER(@TITLE::TEXT),
   '%')
-  AND LOWER(DESCRIPTION) LIKE CONCAT('%',
-  LOWER(@DESCRIPTION::TEXT),
-  '%');
-
--- name: getCategoriesByUserIdAndType :many
-SELECT
-  *
-FROM
-  CATEGORIES
-WHERE
-  USER_ID = $1
-  AND TYPE = $2;
-
--- name: getCategoriesByUserIdAndTypeAndTitle :many
-SELECT
-  *
-FROM
-  CATEGORIES
-WHERE
-  USER_ID = $1
-  AND TYPE = $2
-  AND LOWER(TITLE) LIKE CONCAT('%',
-  LOWER(@TITLE::TEXT),
-  '%');
-
--- name: getCategoriesByUserIdAndTypeAndDescription :many
-
-SELECT
-  *
-FROM
-  CATEGORIES
-WHERE
-  USER_ID = $1
-  AND TYPE = $2
   AND LOWER(DESCRIPTION) LIKE CONCAT('%',
   LOWER(@DESCRIPTION::TEXT),
   '%');
